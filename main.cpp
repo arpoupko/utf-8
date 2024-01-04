@@ -4,7 +4,8 @@
 
 int MAX_STRING_LENGTH= 256;
 
-// function to decode
+#include <cstdio>
+#include <cstdlib>
 int my_utf8_decode(char *input, char *output) {
     if (input == nullptr || output == nullptr) {
         return -1;  // Error: invalid input or output pointer
@@ -237,9 +238,9 @@ bool is_utf8_start(unsigned char byte) {
     }
 }
 
-// Function to return the UTF-8 encoded character at a specific index/ location
+// Function to return the UTF-8 encoded character at a specific index/location
 char *my_utf8_charat(char *string, int index) {
-    // Check for invalid input: a null string or negative index
+    // Check for invalid input: a null string or a negative index
     if (string == NULL || index < 0) {
         return NULL;
     }
@@ -897,6 +898,18 @@ void test_all() {
     test_encode("", "");
     // Edge case: Null pointer
     test_encode(NULL, "");
+    test_encode("Extended ASCII: \u00A9", "Extended ASCII: ©");
+    test_encode("Extended ASCII: \u00E9", "Extended ASCII: é");
+    test_encode("Emoticons: \\u1F609\\u1F60D", "Emoticons: 😉😍");
+    test_encode("Math symbols: \\u03A9", "Math symbols: Ω");
+    test_encode("Math symbols: \\u221E", "Math symbols: ∞");
+    test_encode("Special characters: \\u00A1\\u00BF", "Special characters: ¡¿");
+    test_encode("Mix: Hello \\u00E9 and \\u2603", "Mix: Hello é and ☃");
+    test_encode("Multiple escapes in a row: \\u2603\\u2603\\u2603", "Multiple escapes in a row: ☃☃☃");
+    test_encode("Large Unicode character: \\U0001F60A", "Large Unicode character: 😊");
+
+
+
 
     printf("\nTesting my_utf8_decode:\n");
     // Basic tests
@@ -909,7 +922,9 @@ void test_all() {
     // Edge case: Empty string
     test_decode("", "");
     // Edge case: Null pointer
-    test_decode(NULL, "");
+        test_decode("\\u2603 Hello \\U0001F609", "\\u2603 Hello \\U0001F609");
+    test_decode("\\u2603\\u2603\\u2603", "\\u2603\\u2603\\u2603");
+    test_decode("\\u2603\\U0001F609", "\\u2603\\U0001F609");
 
 
     printf("\nTesting my is utf8:\n");
@@ -957,6 +972,7 @@ void test_all() {
     test_utf8_charat("Unicode snowman: ☃", 30, '\0');
     // Null pointer test
     test_utf8_charat(NULL, 5, '\0');
+    test_utf8_charat(NULL, 5, '\0');
 
     printf("\nTesting my_utf8_strcmp:\n");
     test_strcmp("Hello, World!", "Hello, World!", 0);
@@ -974,6 +990,9 @@ void test_all() {
     test_strcmp("Hello", "مرحبا", -1);
     test_strcmp("こんにちは", "안녕하세요", -1);
     test_strcmp("안녕하세요", "안녕하세요", 0);
+    test_strcmp("Mix: Hello \\x65 and \\x26\\x23\\x30\\x33", "Mix: Hello \\x65 and \\x26\\x23\\x30\\x33", 0);
+    test_strcmp("", "\\x4E\\x6F\\x6E\\x2D\\x65\\x6D\\x70\\x74\\x79\\x20\\x73\\x74\\x72\\x69\\x6E\\x67", -1);
+    test_strcmp("\\x48\\x65\\x6C\\x6C\\x6F", "", 1);
 
     //These are the extra functions
     printf("\nTesting my language detector:\n");
@@ -1015,3 +1034,5 @@ int main() {
     test_all();
 
 }
+
+
